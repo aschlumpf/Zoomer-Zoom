@@ -2,14 +2,38 @@
 
 <html>
     <body>
+        <input type="text" name="fname" id = "input"><br>
+        <div id = "menu"></div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
         <script>
-         var socket = io("http://localhost:3000/LiveStockData");;
+         var socket = io("http://localhost:3000/LiveStockData");
        
          socket.on("data",function (obj){
              console.log(obj);
          });
          socket.emit("join",{id:10});
+         let g = document.getElementById("input");
+         let d = document.getElementById('menu');
+         function httpGet(theUrl){
+        var xmlHttp = new XMLHttpRequest();
+        xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+        xmlHttp.send( null );
+        return xmlHttp.responseText;
+    }
+    console.log(g);
+         g.oninput = function(){
+            while (d.firstChild) {
+                 d.removeChild(d.firstChild);
+             }
+            let json = JSON.parse(httpGet("/suggestions/query="+g.value));
+            json.forEach(x=>{
+                var para = document.createElement("p");
+                var node = document.createTextNode(x.company+" "+x.ticker);
+                para.appendChild(node);
+                d.appendChild(para);
+            });
+            // console.log("/suggestions/query="+g.value);
+         }
         </script>
     </body>
 
