@@ -10,7 +10,7 @@ app.use(bodyParser.json());
 const nrpSender = require('./nrp-sender-shim');
 //compiled html files from react should be in public as index.html
 let timers = {};
-app.use(express.static('public'));
+app.use(express.static('./server/public'));
 
 app.get('/suggestions/query=:query',async (req,res)=>{
     try{
