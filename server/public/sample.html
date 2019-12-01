@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html>
+    <body>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+        <script>
+         var socket = io("http://localhost:3000/LiveStockData");;
+       
+         socket.on("data",function (obj){
+             console.log(obj);
+         });
+         socket.emit("join",{id:10});
+        </script>
+    </body>
+
+</html>

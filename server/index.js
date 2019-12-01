@@ -3,12 +3,13 @@ const Promise = require('bluebird');
 var app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-// const chat = io.of('/chat');
+const liveStock = io.of('/LiveStockData');
 const redisConnection = (require('./redis-connection'));
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 const nrpSender = require('./nrp-sender-shim');
 //compiled html files from react should be in public as index.html
+let timers = {};
 app.use(express.static('public'));
 
 app.get('/suggestions/query=:query',async (req,res)=>{
@@ -46,10 +47,50 @@ app.get('/meta/id=:id',async (req,res)=>{
     }
 });
 
-// app.get('*',async(req,res)=>{
-//     console.log(req);
-//     res.json({message:"okay"});
-// })
+
+liveStock.on("connection",(socket)=>{
+    let rooms = {};
+    socket.on("join", (obj)=>{
+        socket.join(obj.id);
+        if(timers[obj.id]==null){
+            timers[obj.id]={
+                obj: setInterval(async ()=>{
+                    console.log("interval");
+                    try{
+                        let result = await nrpSender.sendMessage({
+                            redis: redisConnection,
+                            eventName: 'StockData',
+                            data:{
+                                id: parseInt(obj.id)
+                            }
+                        });
+                        
+                        io.of('/LiveStockData').to(obj.id).emit('data',result);
+                        console.log(result);
+                    }catch(e){
+                        
+                        console.log(e);
+                    }
+                },3000),
+                num : 1
+            };
+        }else{
+            timers[obj.id].num = timers[obj.id].num+1;
+        }
+        rooms[obj.id] = true;
+    });
+    socket.on("disconnect",()=>{
+        Object.keys(rooms).forEach(room=>{
+            timers[room].num = timers[room].num-1;
+            if(timers[room].num==0){
+                clearInterval(timers[room].obj);
+                delete timers[room];
+            }
+        });
+    });
+
+})
+
 http.listen(3000,()=>{
     // console.log(chat);
     console.log("listening on port 3000");
