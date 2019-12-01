@@ -1,21 +1,21 @@
 const stk =  require("./collections").stk;
-var ObjectId = require('mongodb').ObjectID;
+// var ObjectId = require('mongodb').ObjectID;
 
-const create_object = function create_object(ticker,company, sector){	
+const create_object = function create_object(id,ticker,company, sector){	
 	return {
-		
+		_id : id,
 		ticker: ticker,
 		company: company,
-		price: Math.Random()*1000.0,
+		price: Math.random()*1000.0,
 		sector: sector,
-		open: Math.Random()*1000.0,
-		yield:Math.Random()*10.0,
-		marketCap: Math.Random()*100000000000.0
+		open: Math.random()*1000.0,
+		yield:Math.random()*10.0,
+		marketCap: Math.random()*100000000000.0
 	};
 
 };
-const create = async function create(ticker,company, sector){
-	var obj = create_object(ticker,company, sector);
+const create = async function create(id,ticker,company, sector){
+	var obj = create_object(id,ticker,company, sector);
 	const ac = await stk();
 	const insertInfo = await ac.insertOne(obj);
 	if(insertInfo.insertedCount==0){
@@ -46,21 +46,33 @@ const getByCompany = async function getByCompany(company){
 	}
 	return stkResult;
 };
-const getByID = async function getByID(ID){
+const getByID = async function getByID(id){
 	const ac = await stk();
-	const stkResult = await ac.findOne({_id : ObjectId(id)});
+	const stkResult = await ac.findOne({_id : id});
 	if(stkResult===null){
 		throw ("no stock with given id "+id);
 	}
 	return stkResult;
 }
+const update = async function update(id, price){
+	const ac = await stk();
+	let new_obj = {$set:{
+		price: price
+	}};
+	const update_info = await ac.updateOne({_id: id},new_obj);
+	if(update_info.modifiedCount===0){
+		throw ("no stock of id "+ id+ " was updated");
+	}
+	return await getByID(id);
+};
 
 module.exports = {
 	
 	create,
 	getByTicker,
 	getByCompany,
-	getByID
+	getByID,
+	update
 
 
 }
