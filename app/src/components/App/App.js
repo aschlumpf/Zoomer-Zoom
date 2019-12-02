@@ -75,7 +75,7 @@ const App = ({ testAction }) => {
         open={drawerOpen}
       >
         <div className={classes.drawerHeader}>
-          <h2>My Portfolio</h2>
+          <h1>My Portfolio</h1>
         </div>
         <Divider />
         <List>
