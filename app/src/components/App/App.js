@@ -1,5 +1,5 @@
 // external
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
 
@@ -11,16 +11,22 @@ import {
   List,
   ListItem,
   ListItemText,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
 } from '@material-ui/core';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 // local
-import { ZoomerDrawer } from '../';
-import { testAction } from '../../actions';
+import { addToPortfolio } from '../../actions';
 
 const drawerWidth = 240;
 
-const useStyles = makeStyles(theme =>
+const useStyles = makeStyles((theme) =>
   createStyles({
     root: {
       display: 'flex',
@@ -58,13 +64,46 @@ const useStyles = makeStyles(theme =>
   })
 );
 
-const App = ({ testAction }) => {
+const App = ({ addToPortfolio, stocks }) => {
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newStock, setNewStock] = useState('');
+
+  const closeDialog = (option) => {
+    if (option === 'SAVE' && newStock) {
+      addToPortfolio(newStock);
+      setNewStock('');
+    }
+    setDialogOpen(false);
+  };
+
+  useEffect(() => {}, []);
 
   return (
     <div className={classes.root}>
       <CssBaseline />
+      <Dialog open={dialogOpen} maxWidth="sm">
+        <DialogTitle>Add a new stock</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="New Stock"
+            type="text"
+            onChange={(event) => setNewStock(event.target.value)}
+            fullWidth
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => closeDialog('CLOSE')} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={() => closeDialog('SAVE')} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Drawer
         className={classes.drawer}
         classes={{
@@ -79,12 +118,12 @@ const App = ({ testAction }) => {
         </div>
         <Divider />
         <List>
-          {['GOOG', 'FB', 'TSLA'].map((text, index) => (
+          {stocks.map((text, index) => (
             <ListItem button key={index}>
               <ListItemText primary={text} />
             </ListItem>
           ))}
-          <ListItem button>
+          <ListItem button onClick={() => setDialogOpen(true)}>
             <ListItemText primary="Add New.." />
           </ListItem>
         </List>
@@ -94,7 +133,7 @@ const App = ({ testAction }) => {
           [classes.contentShift]: drawerOpen,
         })}
       >
-        <h1>Zoomers zoom!</h1>
+        <h1>Zoomers zoom</h1>
         <button onClick={() => setDrawerOpen(!drawerOpen)}>
           Toggle Drawer
         </button>
@@ -103,4 +142,13 @@ const App = ({ testAction }) => {
   );
 };
 
-export default connect(null, { testAction })(App);
+const mapStateToProps = (state) => {
+  const { portfolio } = state;
+  return {
+    ...portfolio,
+  };
+};
+
+export default connect(mapStateToProps, {
+  addToPortfolio,
+})(App);

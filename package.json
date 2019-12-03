@@ -21,6 +21,7 @@
     "express": "^4.17.1",
     "flexsearch": "^0.6.32",
     "http": "0.0.0",
+    "local-storage": "^2.0.0",
     "mongodb": "^3.3.5",
     "node-redis-pubsub": "^4.0.0",
     "node-uuid": "^1.4.8",

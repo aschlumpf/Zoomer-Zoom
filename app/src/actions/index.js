@@ -1,4 +1,4 @@
-export const testAction = text => ({
-  type: 'TEST_ACTION',
-  text,
+export const addToPortfolio = (stock) => ({
+  type: 'P_ADD_STOCK',
+  stock,
 });
