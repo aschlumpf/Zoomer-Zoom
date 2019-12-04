@@ -15,14 +15,15 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   TextField,
 } from '@material-ui/core';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 // local
+import { ZoomerStocks } from '../';
 import { addToPortfolio } from '../../actions';
+import './App.module.scss';
 
 const drawerWidth = 240;
 
@@ -61,6 +62,9 @@ const useStyles = makeStyles((theme) =>
     drawerPaper: {
       width: drawerWidth,
     },
+    dialog: {
+      maxWidth: 480,
+    },
   })
 );
 
@@ -68,6 +72,8 @@ const App = ({ addToPortfolio, stocks }) => {
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [stockInputOpen, setStockInputOpen] = useState(false);
+
   const [newStock, setNewStock] = useState('');
 
   const closeDialog = (option) => {
@@ -83,16 +89,13 @@ const App = ({ addToPortfolio, stocks }) => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <Dialog open={dialogOpen} maxWidth="sm">
+      <Dialog open={dialogOpen} maxWidth="md" fullWidth>
         <DialogTitle>Add a new stock</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="New Stock"
-            type="text"
-            onChange={(event) => setNewStock(event.target.value)}
-            fullWidth
+          <ZoomerStocks
+            open={stockInputOpen}
+            setOpen={setStockInputOpen}
+            formCtrl={setNewStock}
           />
         </DialogContent>
         <DialogActions>

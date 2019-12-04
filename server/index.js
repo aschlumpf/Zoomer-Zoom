@@ -8,9 +8,11 @@ const redisConnection = (require('./redis-connection'));
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 const nrpSender = require('./nrp-sender-shim');
+const cors = require('cors');
 //compiled html files from react should be in public as index.html
 let timers = {};
 app.use(express.static('./server/public'));
+app.use(cors());
 
 app.get('/suggestions/query=:query',async (req,res)=>{
     try{
