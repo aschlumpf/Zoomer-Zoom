@@ -13,8 +13,8 @@ const ZoomerStocks = ({ onClose, formCtrl }) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState('');
-  const loading = open && options.length === 0;
-
+  const [loading, setLoading] = useState(false);
+  console.log(loading);
   useEffect(() => {
     let active = true;
 
@@ -35,6 +35,7 @@ const ZoomerStocks = ({ onClose, formCtrl }) => {
               ticker: stock.ticker,
             }))
           );
+          setLoading(false);
         }
       })();
     }
@@ -42,6 +43,15 @@ const ZoomerStocks = ({ onClose, formCtrl }) => {
       active = false;
     };
   }, [loading, query]);
+
+  useEffect(() => {
+    if (query) {
+      setLoading(true);
+    } else {
+      setLoading(false);
+      setOptions([]);
+    }
+  }, [query]);
 
   useEffect(() => {
     if (!open) {
