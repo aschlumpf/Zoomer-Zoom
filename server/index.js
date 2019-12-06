@@ -1,6 +1,7 @@
 var express = require('express');
 const Promise = require('bluebird');
 var app = express();
+const cors = require('cors');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const liveStock = io.of('/LiveStockData');
@@ -8,17 +9,20 @@ const redisConnection = (require('./redis-connection'));
 const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 const nrpSender = require('./nrp-sender-shim');
+let sanitize = require('mongo-sanitize');
 //compiled html files from react should be in public as index.html
 let timers = {};
+app.use(cors());
 app.use(express.static('./server/public'));
 
 app.get('/suggestions/query=:query',async (req,res)=>{
     try{
+        console.log(sanitize(req.params.query));
         let obj = await nrpSender.sendMessage({
             redis: redisConnection,
             eventName: 'suggestions',
             data:{
-                query:req.params.query
+                query:sanitize(req.params.query)
             }
         });
 
@@ -35,7 +39,7 @@ app.get('/meta/id=:id',async (req,res)=>{
             redis: redisConnection,
             eventName: 'meta',
             data:{
-                id: parseInt(req.params.id)
+                id: parseInt(sanitize(req.params.id))
             }
         });
 
