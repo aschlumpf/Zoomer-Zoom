@@ -66,7 +66,7 @@ const ZoomerStocks = ({ onClose, formCtrl }) => {
       onOpen={() => {
         setOpen(true);
       }}
-      onChange={(_event, value) => formCtrl(value.ticker)}
+      onChange={(_event, value) => formCtrl(value)}
       onInputChange={debounce((_event, value) => {
         setQuery(value);
       }, 300)}

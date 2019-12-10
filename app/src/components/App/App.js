@@ -74,12 +74,12 @@ const App = ({ addToPortfolio, stocks }) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [stockInputOpen, setStockInputOpen] = useState(false);
 
-  const [newStock, setNewStock] = useState('');
+  const [newStock, setNewStock] = useState({});
 
   const closeDialog = (option) => {
     if (option === 'SAVE' && newStock) {
       addToPortfolio(newStock);
-      setNewStock('');
+      setNewStock({});
     }
     setDialogOpen(false);
   };
@@ -121,9 +121,9 @@ const App = ({ addToPortfolio, stocks }) => {
         </div>
         <Divider />
         <List>
-          {stocks.map((text, index) => (
+          {stocks.map((stock, index) => (
             <ListItem button key={index}>
-              <ListItemText primary={text} />
+              <ListItemText primary={`$${stock.ticker}: ${stock.company}`} />
             </ListItem>
           ))}
           <ListItem button onClick={() => setDialogOpen(true)}>
