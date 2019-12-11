@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import clsx from 'clsx';
+import io from 'socket.io-client';
 
 // material
 import {
@@ -17,12 +18,14 @@ import {
   DialogContent,
   DialogTitle,
   TextField,
+  Collapse,
 } from '@material-ui/core';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
-
+import ExpandLess from '@material-ui/icons/ExpandLess';
+import ExpandMore from '@material-ui/icons/ExpandMore';
 // local
 import { ZoomerStocks } from '../';
-import { addToPortfolio } from '../../actions';
+import { addToPortfolio, updateStockPrice } from '../../actions';
 import './App.module.scss';
 
 const drawerWidth = 240;
@@ -68,23 +71,71 @@ const useStyles = makeStyles((theme) =>
   })
 );
 
-const App = ({ addToPortfolio, stocks }) => {
+const App = ({ addToPortfolio, updateStockPrice, stocks }) => {
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [stockInputOpen, setStockInputOpen] = useState(false);
+  const [stockError, setStockError] = useState(false);
+  const [amountError, setAmountError] = useState(false);
 
+  const [amount, setAmount] = useState(-1);
   const [newStock, setNewStock] = useState({});
+  const [collapseState, setCollapseState] = useState(
+    new Array(stocks.length).fill(false)
+  );
+
+  const [stockSubscription, setStockSubscription] = useState(null);
+
+  const validate = () => {
+    let valid = true;
+    if (!newStock.ticker || !newStock.company) {
+      setStockError(true);
+      valid = false;
+    }
+    if (amount < 0) {
+      setAmountError(true);
+      valid = false;
+    }
+    return valid;
+  };
 
   const closeDialog = (option) => {
     if (option === 'SAVE' && newStock) {
-      addToPortfolio(newStock);
-      setNewStock({});
+      if (validate()) {
+        addToPortfolio({ ...newStock, amount });
+        stockSubscription.emit('join', { id: newStock.id });
+        setNewStock({});
+        setAmount(-1);
+      } else {
+        return;
+      }
     }
     setDialogOpen(false);
   };
 
-  useEffect(() => {}, []);
+  const collapse = (index) => {
+    const newState = [...collapseState];
+    newState[index] = !newState[index];
+    setCollapseState(newState);
+  };
+
+  useEffect(() => {
+    setCollapseState([...collapseState, false]);
+  }, [stocks]);
+
+  useEffect(() => {
+    const subscription = io('http://localhost:3000/LiveStockData');
+    subscription.on('data', (result) => {
+      const { _id: id, price } = result;
+      updateStockPrice(id, price);
+    });
+    stocks.forEach((stock) => {
+      subscription.emit('join', { id: stock.id });
+    });
+    setStockSubscription(subscription);
+    return () => stockSubscription.close();
+  }, []);
 
   return (
     <div className={classes.root}>
@@ -92,11 +143,28 @@ const App = ({ addToPortfolio, stocks }) => {
       <Dialog open={dialogOpen} maxWidth="md" fullWidth>
         <DialogTitle>Add a new stock</DialogTitle>
         <DialogContent>
-          <ZoomerStocks
-            open={stockInputOpen}
-            setOpen={setStockInputOpen}
-            formCtrl={setNewStock}
-          />
+          <form>
+            <ZoomerStocks
+              required
+              error={stockError}
+              setError={setStockError}
+              open={stockInputOpen}
+              setOpen={setStockInputOpen}
+              formCtrl={setNewStock}
+            />
+            <TextField
+              className="form-control"
+              required
+              helperText={amountError && 'Enter a valid number of stocks'}
+              error={amountError}
+              onChange={(event) => {
+                setAmountError(false);
+                setAmount(event.target.value);
+              }}
+              label="Number of shares"
+              type="number"
+            />
+          </form>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => closeDialog('CLOSE')} color="primary">
@@ -122,9 +190,23 @@ const App = ({ addToPortfolio, stocks }) => {
         <Divider />
         <List>
           {stocks.map((stock, index) => (
-            <ListItem button key={index}>
-              <ListItemText primary={`$${stock.ticker}: ${stock.company}`} />
-            </ListItem>
+            <div key={index}>
+              <ListItem>
+                <ListItemText
+                  primary={`$${stock.ticker} (${stock.amount}): ${stock.price *
+                    stock.amount}`}
+                />
+                <span onClick={() => collapse(index)}>
+                  {!collapseState[index] ? <ExpandMore /> : <ExpandLess />}
+                </span>
+              </ListItem>
+              <Collapse
+                className="MuiListItem-gutters"
+                in={collapseState[index]}
+              >
+                <p>{stock.company}</p>
+              </Collapse>
+            </div>
           ))}
           <ListItem button onClick={() => setDialogOpen(true)}>
             <ListItemText primary="Add New.." />
@@ -154,4 +236,5 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   addToPortfolio,
+  updateStockPrice,
 })(App);

@@ -13,6 +13,7 @@ const cors = require('cors');
 let timers = {};
 app.use(express.static('./server/public'));
 app.use(cors());
+io.origins('*:*');
 
 app.get('/suggestions/query=:query',async (req,res)=>{
     try{
