@@ -3,10 +3,12 @@ const stockData = require("./data");
 const stockDataLength = stockData.length;
 const FlexSearch = require("flexsearch");
 const loadDatabase = async ()=>{
+    await data.drop();
     let count = 0;
     for(let count = 0; count<stockDataLength; ++count){
         await data.create(count,stockData[count].Symbol,stockData[count].Name,stockData[count].Sector);
     }
+    
 };
 
 const createSearchIndex =  ()=>{

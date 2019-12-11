@@ -1,6 +1,9 @@
 const stk =  require("./collections").stk;
 // var ObjectId = require('mongodb').ObjectID;
-
+const drop = async function (){
+	const ac = await stk();
+	await ac.deleteMany({});
+}
 const create_object = function create_object(id,ticker,company, sector){	
 	return {
 		_id : id,
@@ -72,7 +75,8 @@ module.exports = {
 	getByTicker,
 	getByCompany,
 	getByID,
-	update
+	update,
+	drop
 
 
 }
