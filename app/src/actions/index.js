@@ -3,8 +3,25 @@ export const addToPortfolio = (stock) => ({
   stock,
 });
 
+export const deleteFromPortfolio = (id) => ({
+  type: 'P_DEL_STOCK',
+  id,
+});
+
+export const updateStockAmount = (id, amount) => ({
+  type: 'P_NEW_AMOUNT',
+  id,
+  amount,
+});
+
 export const updateStockPrice = (id, price) => ({
   type: 'P_NEW_PRICE',
   id,
   price,
+});
+
+export const updateMetadata = (id, metadata) => ({
+  type: 'P_NEW_METADATA',
+  id,
+  metadata,
 });

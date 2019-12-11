@@ -5,3 +5,31 @@
 .collapse-button {
   cursor: pointer;
 }
+
+.inline {
+  width: 100%;
+  display: inline-block;
+  margin: auto;
+  button {
+    margin-top: -8px;
+  }
+}
+
+.stock-search-container {
+  width: 100%;
+  display: flex;
+  margin: auto;
+}
+
+.stock-search {
+  width: 700px;
+  margin-right: 10px;
+}
+
+.graph {
+  margin-top: 20px;
+  width: 700px;
+  height: 700px;
+  text-align: center;
+  border: 5px solid black;
+}
