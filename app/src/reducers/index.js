@@ -12,7 +12,7 @@ const addStock = (state, action) => {
   const { id, ticker, company, amount } = stock;
   const newStocks = [
     ...state.stocks,
-    { id, ticker, company, amount: Number(amount), price: 0 },
+    { id, ticker, company, amount: Number(amount), price: 0, value: 0 },
   ];
   ls.set(STOCKS, newStocks);
   const newState = { ...state, stocks: newStocks };
@@ -25,8 +25,8 @@ const newPrice = (state, action) => {
 
   state.stocks.forEach((stock) => {
     if (stock.id === id) {
-      console.log(id);
       stock.price = Math.round(price * 100) / 100;
+      stock.value = (stock.price * stock.amount).toFixed(2);
       newStocks.push(stock);
     } else {
       newStocks.push(stock);

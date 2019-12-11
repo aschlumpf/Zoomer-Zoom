@@ -193,10 +193,12 @@ const App = ({ addToPortfolio, updateStockPrice, stocks }) => {
             <div key={index}>
               <ListItem>
                 <ListItemText
-                  primary={`$${stock.ticker} (${stock.amount}): ${stock.price *
-                    stock.amount}`}
+                  primary={`$${stock.ticker} (${stock.amount}): $${stock.value}`}
                 />
-                <span onClick={() => collapse(index)}>
+                <span
+                  className="collapse-button"
+                  onClick={() => collapse(index)}
+                >
                   {!collapseState[index] ? <ExpandMore /> : <ExpandLess />}
                 </span>
               </ListItem>
