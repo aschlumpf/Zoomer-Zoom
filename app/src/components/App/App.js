@@ -301,7 +301,9 @@ const App = (props) => {
                       <span>Share Count </span>
                       <IconButton
                         color={
-                          !editState[index].editMode ? 'default' : 'primary'
+                          editState[index] && !editState[index].editMode
+                            ? 'default'
+                            : 'primary'
                         }
                         onClick={() => toggleEditMode(index)}
                         edge="start"
@@ -311,7 +313,7 @@ const App = (props) => {
                     </div>
                   </dt>
                   <dd>
-                    {!editState[index].editMode ? (
+                    {editState[index] && !editState[index].editMode ? (
                       stock.amount
                     ) : (
                       <TextField
