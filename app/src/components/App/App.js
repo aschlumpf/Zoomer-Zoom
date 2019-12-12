@@ -29,7 +29,13 @@ import {
   FormControlLabel,
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, CreateOutlined } from '@material-ui/icons';
-import { makeStyles, createStyles } from '@material-ui/core/styles';
+import {
+  createMuiTheme,
+  makeStyles,
+  createStyles,
+} from '@material-ui/core/styles';
+import { ThemeProvider } from '@material-ui/styles';
+import red from '@material-ui/core/colors/red';
 
 // local
 import { ZoomerStocks } from '../';
@@ -45,6 +51,12 @@ import {
 import './App.module.scss';
 
 const drawerWidth = 240;
+
+const theme = createMuiTheme({
+  palette: {
+    secondary: { main: red.A700 },
+  },
+});
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -87,6 +99,7 @@ const useStyles = makeStyles((theme) =>
     },
     stockName: {
       fontWeight: 'bold',
+      fontSize: '14pt',
     },
     addButton: {
       textTransform: 'none',
@@ -259,190 +272,190 @@ const App = (props) => {
   }, []);
 
   return (
-    <div className={classes.root}>
-      <CssBaseline />
-      <Dialog open={dialogOpen} maxWidth="md" fullWidth>
-        <DialogTitle>Add a new stock</DialogTitle>
-        <DialogContent>
-          <form>
-            <ZoomerStocks
-              required
-              error={stockError}
-              setError={setStockError}
-              formCtrl={setNewStock}
-            />
-            <TextField
-              className="form-control"
-              required
-              helperText={amountError && 'Enter a valid number of stocks'}
-              error={amountError}
-              onChange={(event) => {
-                setAmountError(false);
-                setAmount(event.target.value);
-              }}
-              label="Number of shares"
-              type="number"
-            />
-          </form>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => closeDialog('CLOSE')} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={() => closeDialog('SAVE')} color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <Drawer
-        className={classes.drawer}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-        variant="persistent"
-        anchor="left"
-        open={drawerOpen}
-      >
-        <div className={classes.drawerHeader}>
-          <Typography variant="h3" color="primary">
-            My Portfolio
-          </Typography>
-          <Button
-            className={classes.addButton}
-            color="primary"
-            variant="text"
-            onClick={() => setDialogOpen(true)}
-          >
-            Add New Stock
-          </Button>
-          {/* <FormControlLabel
+    <ThemeProvider theme={theme}>
+      <div className={classes.root}>
+        <CssBaseline />
+        <Dialog open={dialogOpen} maxWidth="md" fullWidth>
+          <DialogTitle>Add a new stock</DialogTitle>
+          <DialogContent>
+            <form>
+              <ZoomerStocks
+                required
+                error={stockError}
+                setError={setStockError}
+                formCtrl={setNewStock}
+              />
+              <TextField
+                className="form-control"
+                required
+                helperText={amountError && 'Enter a valid number of stocks'}
+                error={amountError}
+                onChange={(event) => {
+                  setAmountError(false);
+                  setAmount(event.target.value);
+                }}
+                label="Number of shares"
+                type="number"
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => closeDialog('CLOSE')} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={() => closeDialog('SAVE')} color="primary">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+        <Drawer
+          className={classes.drawer}
+          classes={{
+            paper: classes.drawerPaper,
+          }}
+          variant="persistent"
+          anchor="left"
+          open={drawerOpen}
+        >
+          <div className={classes.drawerHeader}>
+            <h1 className="my-portfolio">My Portfolio</h1>
+            <Button
+              className={classes.addButton}
+              color="primary"
+              variant="text"
+              onClick={() => setDialogOpen(true)}
+            >
+              Add New Stock
+            </Button>
+            {/* <FormControlLabel
             labelPlacement="start"
             control={
               <Switch onClick={() => togglePortfolioGraph()} color="primary" />
             }
             label="See Graph"
           /> */}
-          <Typography variant="body1">{`Total Value: ${totalValue ||
-            '$0.00'}`}</Typography>
-        </div>
-        <Divider />
-        <List>
-          {stocks.map(
-            (stock, index) =>
-              !stock.isSelected && (
-                <div key={index}>
-                  <ListItem>
-                    <ListItemText
-                      primary={`$${stock.ticker} $${stock.value.toFixed(2)}`}
-                    />
-                    <IconButton
-                      className="collapse-button"
-                      onClick={() => collapse(index)}
-                    >
-                      {!collapseState[index] ? <ExpandMore /> : <ExpandLess />}
-                    </IconButton>
-                  </ListItem>
-                  <Collapse
-                    className="MuiListItem-gutters"
-                    in={collapseState[index]}
-                  >
-                    <Typography
-                      className={classes.stockName}
-                      gutterBottom
-                      variant="subtitle1"
-                    >
-                      {stock.company}
-                    </Typography>
-                    <Button
-                      onClick={() => {
-                        stockSubscription.emit('leave', { id: stock.id });
-                        deleteFromPortfolio(stock.id, false);
-                      }}
-                      color="secondary"
-                    >
-                      Delete
-                    </Button>
-                    <dl>
-                      <dt>
-                        <div className="inline">
-                          <span>Share Count </span>
-                          <IconButton
-                            color={
-                              editState[index] && !editState[index].editMode
-                                ? 'default'
-                                : 'primary'
-                            }
-                            onClick={() => toggleEditMode(index)}
-                            edge="start"
-                          >
-                            <CreateOutlined />
-                          </IconButton>
-                        </div>
-                      </dt>
-                      <dd>
-                        {editState[index] && !editState[index].editMode ? (
-                          stock.amount
+            <Typography variant="body1">{`Total Value: ${totalValue ||
+              '$0.00'}`}</Typography>
+          </div>
+          <Divider />
+          <List className="stock-list">
+            {stocks.map(
+              (stock, index) =>
+                !stock.isSelected && (
+                  <div key={index}>
+                    <ListItem>
+                      <ListItemText
+                        className="stock-text"
+                        primary={`$${stock.ticker} $${stock.value.toFixed(2)}`}
+                      />
+                      <IconButton
+                        className="collapse-button"
+                        onClick={() => collapse(index)}
+                      >
+                        {!collapseState[index] ? (
+                          <ExpandMore aria-label="Expand" />
                         ) : (
-                          <TextField
-                            onChange={(event) =>
-                              newAmount(event.target.value, stock.id)
-                            }
-                            type="number"
-                            defaultValue={stock.amount}
-                            inputProps={{ min: '1' }}
-                          />
+                          <ExpandLess aria-label="Undo Expand" />
                         )}
-                      </dd>
-                      <dt>Share Price</dt>
-                      <dd>{`$${stock.price}`}</dd>
-                      <dt>Sector</dt>
-                      <dd>{stock.sector}</dd>
-                      <dt>Open</dt>
-                      <dd>{stock.open}</dd>
-                      <dt>Yield</dt>
-                      <dd>{stock.yield}</dd>
-                      <dt>Market Cap</dt>
-                      <dd>{stock.marketCap}</dd>
-                    </dl>
-                  </Collapse>
-                </div>
-              )
-          )}
-        </List>
-      </Drawer>
-      <section
-        className={clsx(classes.content, {
-          [classes.contentShift]: drawerOpen,
-        })}
-      >
-        <Typography className="main-heading" variant="h1" color="primary">
-          Zoomers zoom
-        </Typography>
-        <div className="stock-search-container">
-          <ZoomerStocks
-            id="main-search"
-            disabled={searchDisabled}
-            className="stock-search"
-            formCtrl={changeSelectedStock}
-          />{' '}
-          <Button
-            size="large"
-            variant="contained"
-            color="primary"
-            className={classes.addButton}
-            onClick={() => setDrawerOpen(!drawerOpen)}
-          >
-            Toggle Portfolio
-          </Button>
-        </div>
-        <section className="selected-stock">
-          <Typography variant="h2" color="primary">
-            Selected Stock Price (in $)
+                      </IconButton>
+                    </ListItem>
+                    <Collapse
+                      className="MuiListItem-gutters"
+                      in={collapseState[index]}
+                    >
+                      <h2 className={classes.stockName}>{stock.company}</h2>
+                      <Button
+                        color="secondary"
+                        onClick={() => {
+                          stockSubscription.emit('leave', { id: stock.id });
+                          deleteFromPortfolio(stock.id, false);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                      <dl>
+                        <dt>
+                          <div className="inline">
+                            <span>Share Count </span>
+                            <IconButton
+                              aria-label="Edit Share Count"
+                              color={
+                                editState[index] && !editState[index].editMode
+                                  ? 'default'
+                                  : 'primary'
+                              }
+                              onClick={() => toggleEditMode(index)}
+                              edge="start"
+                            >
+                              <CreateOutlined />
+                            </IconButton>
+                          </div>
+                        </dt>
+                        <dd>
+                          {editState[index] && !editState[index].editMode ? (
+                            stock.amount
+                          ) : (
+                            <TextField
+                              onChange={(event) =>
+                                newAmount(event.target.value, stock.id)
+                              }
+                              type="number"
+                              defaultValue={stock.amount}
+                              inputProps={{ min: '1' }}
+                            />
+                          )}
+                        </dd>
+                        <dt>Share Price</dt>
+                        <dd>{`$${stock.price}`}</dd>
+                        <dt>Sector</dt>
+                        <dd>{stock.sector}</dd>
+                        <dt>Open</dt>
+                        <dd>{stock.open}</dd>
+                        <dt>Yield</dt>
+                        <dd>{stock.yield}</dd>
+                        <dt>Market Cap</dt>
+                        <dd>{stock.marketCap}</dd>
+                      </dl>
+                    </Collapse>
+                  </div>
+                )
+            )}
+          </List>
+        </Drawer>
+        <section
+          className={clsx(classes.content, {
+            [classes.contentShift]: drawerOpen,
+          })}
+        >
+          <Typography className="main-heading" variant="h1" color="primary">
+            Zoomers zoom
           </Typography>
-          <ZoomerGraph prices={trackedPrice} />
+          <div className="stock-search-container">
+            <ZoomerStocks
+              id="main-search"
+              disabled={searchDisabled}
+              className="stock-search"
+              formCtrl={changeSelectedStock}
+            />{' '}
+            <Button
+              size="large"
+              variant="contained"
+              color="primary"
+              className={classes.addButton}
+              onClick={() => setDrawerOpen(!drawerOpen)}
+            >
+              Toggle Portfolio
+            </Button>
+          </div>
+          <section className="selected-stock">
+            <Typography variant="h2" color="primary">
+              Selected Stock Price (in $)
+            </Typography>
+            <ZoomerGraph prices={trackedPrice} />
+          </section>
         </section>
-      </section>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 };
 

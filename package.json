@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "serve": "concurrently \"node server/index.js\" \"node server/Search/index.js\" \"node server/Stockdata/index.js\" ",
-    "start": "webpack-dev-server --open --mode development"
+    "start": "concurrently \"node server/index.js\" \"node server/Search/index.js\" \"node server/Stockdata/index.js\" \"webpack-dev-server --open --mode development\" "
   },
   "keywords": [],
   "author": "",
