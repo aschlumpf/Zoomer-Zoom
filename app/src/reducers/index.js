@@ -116,7 +116,7 @@ const search = (state = {}, action) => {
   switch (action.type) {
     case 'S_SELECTED_STOCK':
       const { stock } = action;
-      return { selectedStock: stock };
+      return { ...state, selectedStock: stock };
     default:
       return state;
   }
