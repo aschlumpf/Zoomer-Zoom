@@ -3,9 +3,10 @@ export const addToPortfolio = (stock) => ({
   stock,
 });
 
-export const deleteFromPortfolio = (id) => ({
+export const deleteFromPortfolio = (id, isSelected) => ({
   type: 'P_DEL_STOCK',
   id,
+  isSelected,
 });
 
 export const updateStockAmount = (id, amount) => ({

@@ -18,12 +18,23 @@ const toDollarFormat = (number, asFloat, multiple) => {
 
 const addStock = (state, action) => {
   const { stock } = action;
-  const { id, ticker, company, amount } = stock;
+  const { id, ticker, company, amount, isSelected } = stock;
   const newStocks = [
     ...state.stocks,
-    { id, ticker, company, amount: Number(amount), price: 0, value: 0 },
+    {
+      id,
+      ticker,
+      company,
+      amount: Number(amount),
+      price: 0,
+      value: 0,
+      isSelected,
+    },
   ];
-  ls.set(STOCKS, newStocks);
+  ls.set(
+    STOCKS,
+    newStocks.filter((stock) => !stock.isSelected)
+  );
   const newState = { ...state, stocks: newStocks };
   return newState;
 };
@@ -37,10 +48,15 @@ const newPrice = (state, action) => {
       stock.price = toDollarFormat(price, true);
       stock.value = toDollarFormat(stock.price, true, stock.amount);
     }
-    newTotalValue += stock.value;
+    if (!stock.isSelected) {
+      newTotalValue += stock.value;
+    }
     newStocks.push(stock);
   });
-  ls.set(STOCKS, newStocks);
+  ls.set(
+    STOCKS,
+    newStocks.filter((stock) => !stock.isSelected)
+  );
 
   return {
     ...state,
@@ -67,22 +83,31 @@ const updateMetadata = (state, action) => {
       newStocks.push(stock);
     }
   });
-  ls.set(STOCKS, newStocks);
+  ls.set(
+    STOCKS,
+    newStocks.filter((stock) => !stock.isSelected)
+  );
 
   return { ...state, stocks: newStocks };
 };
 
 const deleteStock = (state, action) => {
-  const { id } = action;
+  const { id, isSelected } = action;
   const newStocks = [];
   let newTotalValue = 0;
   state.stocks.forEach((stock) => {
-    if (stock.id !== id) {
+    if (stock.id === id && stock.isSelected === isSelected) {
+    } else {
       newStocks.push(stock);
-      newTotalValue += stock.value;
+      if (!stock.isSelected) {
+        newTotalValue += stock.value;
+      }
     }
   });
-  ls.set(STOCKS, newStocks);
+  ls.set(
+    STOCKS,
+    newStocks.filter((stock) => !stock.isSelected)
+  );
 
   return {
     ...state,
@@ -100,10 +125,15 @@ const updateAmount = (state, action) => {
       stock.amount = Number(amount);
       stock.value = toDollarFormat(stock.price, true, stock.amount);
     }
-    newTotalValue += stock.value;
+    if (!stock.isSelected) {
+      newTotalValue += stock.value;
+    }
     newStocks.push(stock);
   });
-  ls.set(STOCKS, newStocks);
+  ls.set(
+    STOCKS,
+    newStocks.filter((stock) => !stock.isSelected)
+  );
 
   return {
     ...state,

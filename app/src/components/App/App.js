@@ -129,6 +129,18 @@ const App = (props) => {
 
   const [stockSubscription, setStockSubscription] = useState(null);
 
+  const changeSelectedStock = (newStock) => {
+    if (selectedStock) {
+      stockSubscription.emit('leave', { id: selectedStock.id });
+      deleteFromPortfolio(selectedStock.id, true);
+    }
+    if (stockSubscription) {
+      stockSubscription.emit('join', { id: newStock.id });
+    }
+    addToPortfolio({ ...newStock, isSelected: true });
+    setSelectedStock(newStock);
+  };
+
   const togglePortfolioGraph = () => {
     if (!searchDisabled) {
       setSelectedStock(null);
@@ -164,7 +176,7 @@ const App = (props) => {
   const closeDialog = (option) => {
     if (option === 'SAVE' && newStock) {
       if (validate()) {
-        addToPortfolio({ ...newStock, amount });
+        addToPortfolio({ ...newStock, amount, isSelected: false });
         fetchMetadata(newStock.id);
         stockSubscription.emit('join', { id: newStock.id });
         setNewStock({});
@@ -226,7 +238,12 @@ const App = (props) => {
       fetchMetadata(stock.id);
     }
     setStockSubscription(subscription);
-    return () => stockSubscription.close();
+    return () => {
+      stocks.forEach((stock) =>
+        stockSubscription.emit('leave', { id: stock.id })
+      );
+      stockSubscription.close();
+    };
   }, []);
 
   return (
@@ -298,81 +315,87 @@ const App = (props) => {
         </div>
         <Divider />
         <List>
-          {stocks.map((stock, index) => (
-            <div key={index}>
-              <ListItem>
-                <ListItemText
-                  primary={`$${stock.ticker} $${stock.value.toFixed(2)}`}
-                />
-                <IconButton
-                  className="collapse-button"
-                  onClick={() => collapse(index)}
-                >
-                  {!collapseState[index] ? <ExpandMore /> : <ExpandLess />}
-                </IconButton>
-              </ListItem>
-              <Collapse
-                className="MuiListItem-gutters"
-                in={collapseState[index]}
-              >
-                <Typography
-                  className={classes.stockName}
-                  gutterBottom
-                  variant="subtitle1"
-                >
-                  {stock.company}
-                </Typography>
-                <Button
-                  onClick={() => deleteFromPortfolio(stock.id)}
-                  color="secondary"
-                >
-                  Delete
-                </Button>
-                <dl>
-                  <dt>
-                    <div className="inline">
-                      <span>Share Count </span>
-                      <IconButton
-                        color={
-                          editState[index] && !editState[index].editMode
-                            ? 'default'
-                            : 'primary'
-                        }
-                        onClick={() => toggleEditMode(index)}
-                        edge="start"
-                      >
-                        <CreateOutlined />
-                      </IconButton>
-                    </div>
-                  </dt>
-                  <dd>
-                    {editState[index] && !editState[index].editMode ? (
-                      stock.amount
-                    ) : (
-                      <TextField
-                        onChange={(event) =>
-                          newAmount(event.target.value, stock.id)
-                        }
-                        type="number"
-                        defaultValue={stock.amount}
-                        inputProps={{ min: '1' }}
-                      />
-                    )}
-                  </dd>
-                  <dt>Share Price</dt>
-                  <dd>{`$${stock.price}`}</dd>
-                  <dt>Sector</dt>
-                  <dd>{stock.sector}</dd>
-                  <dt>Open</dt>
-                  <dd>{stock.open}</dd>
-                  <dt>Yield</dt>
-                  <dd>{stock.yield}</dd>
-                  <dt>Market Cap</dt>
-                  <dd>{stock.marketCap}</dd>
-                </dl>
-              </Collapse>
-            </div>
-          ))}
+          {stocks.map(
+            (stock, index) =>
+              !stock.isSelected && (
+                <div key={index}>
+                  <ListItem>
+                    <ListItemText
+                      primary={`$${stock.ticker} $${stock.value.toFixed(2)}`}
+                    />
+                    <IconButton
+                      className="collapse-button"
+                      onClick={() => collapse(index)}
+                    >
+                      {!collapseState[index] ? <ExpandMore /> : <ExpandLess />}
+                    </IconButton>
+                  </ListItem>
+                  <Collapse
+                    className="MuiListItem-gutters"
+                    in={collapseState[index]}
+                  >
+                    <Typography
+                      className={classes.stockName}
+                      gutterBottom
+                      variant="subtitle1"
+                    >
+                      {stock.company}
+                    </Typography>
+                    <Button
+                      onClick={() => {
+                        stockSubscription.emit('leave', { id: stock.id });
+                        deleteFromPortfolio(stock.id, false);
+                      }}
+                      color="secondary"
+                    >
+                      Delete
+                    </Button>
+                    <dl>
+                      <dt>
+                        <div className="inline">
+                          <span>Share Count </span>
+                          <IconButton
+                            color={
+                              editState[index] && !editState[index].editMode
+                                ? 'default'
+                                : 'primary'
+                            }
+                            onClick={() => toggleEditMode(index)}
+                            edge="start"
+                          >
+                            <CreateOutlined />
+                          </IconButton>
+                        </div>
+                      </dt>
+                      <dd>
+                        {editState[index] && !editState[index].editMode ? (
+                          stock.amount
+                        ) : (
+                          <TextField
+                            onChange={(event) =>
+                              newAmount(event.target.value, stock.id)
+                            }
+                            type="number"
+                            defaultValue={stock.amount}
+                            inputProps={{ min: '1' }}
+                          />
+                        )}
+                      </dd>
+                      <dt>Share Price</dt>
+                      <dd>{`$${stock.price}`}</dd>
+                      <dt>Sector</dt>
+                      <dd>{stock.sector}</dd>
+                      <dt>Open</dt>
+                      <dd>{stock.open}</dd>
+                      <dt>Yield</dt>
+                      <dd>{stock.yield}</dd>
+                      <dt>Market Cap</dt>
+                      <dd>{stock.marketCap}</dd>
+                    </dl>
+                  </Collapse>
+                </div>
+              )
+          )}
         </List>
       </Drawer>
       <section
@@ -388,7 +411,7 @@ const App = (props) => {
             id="main-search"
             disabled={searchDisabled}
             className="stock-search"
-            formCtrl={setSelectedStock}
+            formCtrl={changeSelectedStock}
           />{' '}
           <Button
             size="large"
