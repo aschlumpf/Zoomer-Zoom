@@ -9,9 +9,11 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json());
 const nrpSender = require('./nrp-sender-shim');
 const cors = require('cors');
+let sanitize = require('mongo-sanitize');
 //compiled html files from react should be in public as index.html
+
 let timers = {};
-app.use(express.static('./server/public'));
+// app.use(express.static('./server/public'));
 app.use(cors());
 io.origins('*:*');
 
@@ -21,7 +23,7 @@ app.get('/suggestions/query=:query',async (req,res)=>{
             redis: redisConnection,
             eventName: 'suggestions',
             data:{
-                query:req.params.query
+                query: sanitize(req.params.query)
             }
         });
 
@@ -38,7 +40,7 @@ app.get('/meta/id=:id',async (req,res)=>{
             redis: redisConnection,
             eventName: 'meta',
             data:{
-                id: parseInt(req.params.id)
+                id: parseInt(sanitize(req.params.id))
             }
         });
 
@@ -54,7 +56,10 @@ app.get('/meta/id=:id',async (req,res)=>{
 liveStock.on("connection",(socket)=>{
     let rooms = {};
     socket.on("join", (obj)=>{
-        socket.join(obj.id);
+        if(parseInt(sanitize(obj.id))>504||parseInt(sanitize(obj.id))<0){
+            return;
+        }
+        socket.join(sanitize(obj.id));
         if(timers[obj.id]==null){
             timers[obj.id]={
                 obj: setInterval(async ()=>{
@@ -64,7 +69,7 @@ liveStock.on("connection",(socket)=>{
                             redis: redisConnection,
                             eventName: 'StockData',
                             data:{
-                                id: parseInt(obj.id)
+                                id: parseInt(sanitize(obj.id))
                             }
                         });
                         
