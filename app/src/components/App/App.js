@@ -315,13 +315,13 @@ const App = (props) => {
           >
             Add New Stock
           </Button>
-          <FormControlLabel
+          {/* <FormControlLabel
             labelPlacement="start"
             control={
               <Switch onClick={() => togglePortfolioGraph()} color="primary" />
             }
             label="See Graph"
-          />
+          /> */}
           <Typography variant="body1">{`Total Value: ${totalValue ||
             '$0.00'}`}</Typography>
         </div>
