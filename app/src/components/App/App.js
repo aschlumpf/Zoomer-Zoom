@@ -25,6 +25,8 @@ import {
   Typography,
   ButtonGroup,
   IconButton,
+  Switch,
+  FormControlLabel,
 } from '@material-ui/core';
 import { ExpandLess, ExpandMore, CreateOutlined } from '@material-ui/icons';
 import { makeStyles, createStyles } from '@material-ui/core/styles';
@@ -110,6 +112,7 @@ const App = (props) => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [stockError, setStockError] = useState(false);
   const [amountError, setAmountError] = useState(false);
+  const [searchDisabled, setSearchDisabled] = useState(false);
 
   const [numStocks, setNumStocks] = useState(0);
   const [amount, setAmount] = useState(-1);
@@ -125,6 +128,15 @@ const App = (props) => {
   );
 
   const [stockSubscription, setStockSubscription] = useState(null);
+
+  const togglePortfolioGraph = () => {
+    if (!searchDisabled) {
+      setSelectedStock(null);
+      setSearchDisabled(true);
+    } else {
+      setSearchDisabled(false);
+    }
+  };
 
   const validate = () => {
     let valid = true;
@@ -274,6 +286,13 @@ const App = (props) => {
           >
             Add New Stock
           </Button>
+          <FormControlLabel
+            labelPlacement="start"
+            control={
+              <Switch onClick={() => togglePortfolioGraph()} color="primary" />
+            }
+            label="See Graph"
+          />
           <Typography variant="body1">{`Total Value: ${totalValue ||
             '$0.00'}`}</Typography>
         </div>
@@ -361,9 +380,16 @@ const App = (props) => {
           [classes.contentShift]: drawerOpen,
         })}
       >
-        <h1>Zoomers zoom</h1>
+        <Typography className="main-heading" variant="h2" color="primary">
+          Zoomers zoom
+        </Typography>
         <div className="stock-search-container">
-          <ZoomerStocks className="stock-search" formCtrl={setSelectedStock} />{' '}
+          <ZoomerStocks
+            id="main-search"
+            disabled={searchDisabled}
+            className="stock-search"
+            formCtrl={setSelectedStock}
+          />{' '}
           <Button
             size="large"
             variant="contained"

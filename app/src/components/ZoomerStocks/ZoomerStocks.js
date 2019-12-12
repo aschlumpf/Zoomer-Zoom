@@ -9,7 +9,15 @@ import { TextField, CircularProgress } from '@material-ui/core';
 
 const SUGGESTIONS_API = 'http://localhost:3000/suggestions/query=';
 
-const ZoomerStocks = ({ className, formCtrl, required, error, setError }) => {
+const ZoomerStocks = ({
+  className,
+  formCtrl,
+  required,
+  error,
+  setError,
+  disabled,
+  id,
+}) => {
   const [open, setOpen] = useState(false);
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState('');
@@ -64,6 +72,7 @@ const ZoomerStocks = ({ className, formCtrl, required, error, setError }) => {
   return (
     <div className={className}>
       <Autocomplete
+        disabled={disabled}
         open={open}
         onOpen={() => {
           setOpen(true);
@@ -80,6 +89,7 @@ const ZoomerStocks = ({ className, formCtrl, required, error, setError }) => {
         renderInput={(params) => (
           <TextField
             {...params}
+            id={id}
             helperText={error && 'Select a stock'}
             required={required}
             error={error}
