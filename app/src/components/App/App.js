@@ -33,6 +33,7 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 
 // local
 import { ZoomerStocks } from '../';
+import { ZoomerGraph } from '../';
 import {
   addToPortfolio,
   updateStockPrice,
@@ -127,18 +128,23 @@ const App = (props) => {
     })
   );
 
+  const [trackedPrice, setTrackedPrice] = useState([]);
+
   const [stockSubscription, setStockSubscription] = useState(null);
 
   const changeSelectedStock = (newStock) => {
     if (selectedStock) {
       stockSubscription.emit('leave', { id: selectedStock.id });
       deleteFromPortfolio(selectedStock.id, true);
+      setSelectedStock({});
     }
-    if (stockSubscription) {
+    if (stockSubscription && newStock) {
       stockSubscription.emit('join', { id: newStock.id });
     }
-    addToPortfolio({ ...newStock, isSelected: true });
-    setSelectedStock(newStock);
+    if (newStock) {
+      addToPortfolio({ ...newStock, isSelected: true });
+      setSelectedStock(newStock);
+    }
   };
 
   const togglePortfolioGraph = () => {
@@ -224,6 +230,12 @@ const App = (props) => {
       );
       setNumStocks(stocks.length);
     }
+    const [currSelectedStock] = stocks.filter((stock) => stock.isSelected);
+    if (currSelectedStock) {
+      setTrackedPrice([...trackedPrice, currSelectedStock.price]);
+    } else {
+      setTrackedPrice([]);
+    }
   }, [stocks]);
 
   useEffect(() => {
@@ -292,7 +304,7 @@ const App = (props) => {
         open={drawerOpen}
       >
         <div className={classes.drawerHeader}>
-          <Typography variant="h4" color="primary">
+          <Typography variant="h3" color="primary">
             My Portfolio
           </Typography>
           <Button
@@ -403,7 +415,7 @@ const App = (props) => {
           [classes.contentShift]: drawerOpen,
         })}
       >
-        <Typography className="main-heading" variant="h2" color="primary">
+        <Typography className="main-heading" variant="h1" color="primary">
           Zoomers zoom
         </Typography>
         <div className="stock-search-container">
@@ -423,9 +435,12 @@ const App = (props) => {
             Toggle Portfolio
           </Button>
         </div>
-        <div className="graph">
-          {(selectedStock && selectedStock.company) || 'Graph goes here'}
-        </div>
+        <section className="selected-stock">
+          <Typography variant="h2" color="primary">
+            Selected Stock Price (in $)
+          </Typography>
+          <ZoomerGraph prices={trackedPrice} />
+        </section>
       </section>
     </div>
   );
