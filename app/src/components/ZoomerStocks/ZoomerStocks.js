@@ -14,7 +14,6 @@ const ZoomerStocks = ({ className, formCtrl, required, error, setError }) => {
   const [options, setOptions] = useState([]);
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
-  console.log(loading);
   useEffect(() => {
     let active = true;
 
@@ -37,7 +36,7 @@ const ZoomerStocks = ({ className, formCtrl, required, error, setError }) => {
             }))
           );
           setLoading(false);
-          setError(false);
+          setError && setError(false);
         }
       })();
     }

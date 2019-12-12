@@ -37,6 +37,7 @@ import {
   updateMetadata,
   updateStockAmount,
   deleteFromPortfolio,
+  setSelectedStock,
 } from '../../actions';
 import './App.module.scss';
 
@@ -99,13 +100,14 @@ const App = (props) => {
     updateStockAmount,
     deleteFromPortfolio,
     totalValue,
+    setSelectedStock,
+    selectedStock,
     stocks,
   } = props;
 
   const classes = useStyles();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [stockInputOpen, setStockInputOpen] = useState(false);
   const [stockError, setStockError] = useState(false);
   const [amountError, setAmountError] = useState(false);
 
@@ -218,8 +220,6 @@ const App = (props) => {
               required
               error={stockError}
               setError={setStockError}
-              open={stockInputOpen}
-              setOpen={setStockInputOpen}
               formCtrl={setNewStock}
             />
             <TextField
@@ -349,12 +349,7 @@ const App = (props) => {
       >
         <h1>Zoomers zoom</h1>
         <div className="stock-search-container">
-          <ZoomerStocks
-            className="stock-search"
-            open={stockInputOpen}
-            setOpen={setStockInputOpen}
-            formCtrl={setNewStock}
-          />{' '}
+          <ZoomerStocks className="stock-search" formCtrl={setSelectedStock} />{' '}
           <Button
             size="large"
             variant="contained"
@@ -365,16 +360,19 @@ const App = (props) => {
             Toggle Portfolio
           </Button>
         </div>
-        <div className="graph">Graph goes here</div>
+        <div className="graph">
+          {(selectedStock && selectedStock.company) || 'Graph goes here'}
+        </div>
       </section>
     </div>
   );
 };
 
 const mapStateToProps = (state) => {
-  const { portfolio } = state;
+  const { portfolio, search } = state;
   return {
     ...portfolio,
+    ...search,
   };
 };
 
@@ -383,4 +381,5 @@ export default connect(mapStateToProps, {
   updateStockPrice,
   updateMetadata,
   updateStockAmount,
+  setSelectedStock,
 })(App);

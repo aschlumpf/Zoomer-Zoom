@@ -112,6 +112,16 @@ const updateAmount = (state, action) => {
   };
 };
 
+const search = (state = {}, action) => {
+  switch (action.type) {
+    case 'S_SELECTED_STOCK':
+      const { stock } = action;
+      return { selectedStock: stock };
+    default:
+      return state;
+  }
+};
+
 const portfolio = (state = initialState, action) => {
   switch (action.type) {
     case 'P_ADD_STOCK':
@@ -131,4 +141,5 @@ const portfolio = (state = initialState, action) => {
 
 export default combineReducers({
   portfolio,
+  search,
 });

@@ -25,3 +25,8 @@ export const updateMetadata = (id, metadata) => ({
   id,
   metadata,
 });
+
+export const setSelectedStock = (stock) => ({
+  type: 'S_SELECTED_STOCK',
+  stock,
+});
