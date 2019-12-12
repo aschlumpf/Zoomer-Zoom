@@ -192,6 +192,14 @@ const App = (props) => {
       setEditState([...editState, { amount: 0, editMode: false }]);
       setNumStocks(stocks.length);
     }
+    // There can be changes other than length!!
+    if (stocks.length < numStocks) {
+      setCollapseState(new Array(stocks.length).fill(false));
+      setEditState(
+        new Array(stocks.length).fill({ amount: 0, editMode: false })
+      );
+      setNumStocks(stocks.length);
+    }
   }, [stocks]);
 
   useEffect(() => {
@@ -295,6 +303,12 @@ const App = (props) => {
                 >
                   {stock.company}
                 </Typography>
+                <Button
+                  onClick={() => deleteFromPortfolio(stock.id)}
+                  color="secondary"
+                >
+                  Delete
+                </Button>
                 <dl>
                   <dt>
                     <div className="inline">
@@ -378,6 +392,7 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   addToPortfolio,
+  deleteFromPortfolio,
   updateStockPrice,
   updateMetadata,
   updateStockAmount,
