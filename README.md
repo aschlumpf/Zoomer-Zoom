@@ -1,24 +1,25 @@
 # Zoomer-Zoom
-CS554 Final Project
+CS554 (Web Programming II) Final Project
 
-# API Specifications for backend
-## Search API
-Get on /suggestions/query={query} will return a json array with stock ID, symbol, and name. For example,
-/suggestions/query=micro will return
-[{"_id":310,"company":"Microchip Technology","ticker":"MCHP"},{"_id":311,"company":"Micron Technology","ticker":"MU"},{"_id":312,"company":"Microsoft Corp.","ticker":"MSFT"},{"_id":9,"company":"Advanced Micro Devices Inc","ticker":"AMD"}]
-It supports partial search.
-## Metadata API
-Get on /meta/id={id} will return a json object with stock information.
-For example,
-/meta/id=499 returns
-{"_id":499,"ticker":"XL","company":"XL Capital","sector":"Financials","open":571.2830368344222,"yield":4.638218658852664,"marketCap":14548405873.092495}
-## Socket API
-The backend generates made up (but stochastically accurate) stock data. But it gives only live information I.E past data is not available.
-To join a channel, you join on the id, and listen on stockInfo. It will only return the current price. Example code:  
-var socket = io("http://localhost:3000/LiveStockData");  
-socket.on("data",function (obj){  
-             console.log(obj);  
-});  
-socket.emit("join",{id:10});  
-You can join any number of stock id channels and it'll send all the data to 'data'.  
+This project aims to allow users to view (mocked) stack data in real time. A user can start the program, and query for stocks by their ticker symbol or name. Users can also add stocks to a portfolio, which is held inside of a drawer that can be toggled on the left side of the screen. The portfolio displays real-time prices of all stocks within it, as well as the value of their entire portfolio. Dropdowns on the stocks within a portfolio will show additional information about that stock, such as its sector and market cap. For tracking a stock's growth in real-time, the user can select the desired stock from the search bar on the main page, and a graph for that stock will appear and update as new prices come in.
+
+# Technology
+
+The backend is build using three servers. One server acts to serve the queries for stock search and stock metadata. This server calls to the second server via Redis pub-sub, which essentially acts as a worker to perform a FlexSearch on all listed stocks. The third and final server delivers real-time stock prices via Socket.io. Prices for each stock change on a random interval in an attempt to emulate the real market.
+
+The frontend is built in React.js 16 with hooks, and MaterialUI as the primary component framework. MaterialUI provides an easy way to make the application look modern, user-friendly, and accessible. The framework also provides APIs for component features such as lazy-loading and form control validation. 
+
+# Running the application
+
+To run the app, simply run the following commands:
+
+`npm install`
+`npm start`
+
+These commands will install all necessary packages for both the backend and frontend. The `start` script uses the package Concurrently in order to run all servers in one console.
+
+# Credits
+
+Credit to my classmate [Hari](https://github.com/Hariharan-V) for developing the backend for this project. Additionally credits to [Professor Baressi](https://github.com/philbarresi) for running a great Web Development course and providing us reference code for technologies such as Webpack, Redis, and Socket.io. 
+
 
