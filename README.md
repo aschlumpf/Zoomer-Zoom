@@ -7,7 +7,7 @@ This project aims to allow users to view (mocked) stack data in real time. A use
 
 The backend is build using three servers. One server acts to serve the queries for stock search and stock metadata. This server calls to the second server via Redis pub-sub, which essentially acts as a worker to perform a FlexSearch on all listed stocks. The third and final server delivers real-time stock prices via Socket.io. Prices for each stock change on a random interval in an attempt to emulate the real market.
 
-The frontend is built in React.js 16 with hooks, and MaterialUI as the primary component framework. MaterialUI provides an easy way to make the application look modern, user-friendly, and accessible. The framework also provides APIs for component features such as lazy-loading and form control validation. 
+The frontend is built in React.js 16 with hooks, and uses MaterialUI as the primary component framework. MaterialUI provides an easy way to make the application look modern, user-friendly, and accessible. The framework also provides APIs for component features such as lazy-loading and form control validation. 
 
 # Running the application
 
