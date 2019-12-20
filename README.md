@@ -11,9 +11,10 @@ The frontend is built in React.js 16 with hooks, and uses MaterialUI as the prim
 
 # Running the application
 
-To run the app, simply run the following commands:
+To run the app, simply run the following commands in succession:
 
 `npm install`
+
 `npm start`
 
 These commands will install all necessary packages for both the backend and frontend. The `start` script uses the package Concurrently in order to run all servers in one console.
