@@ -17,7 +17,7 @@ To run the app, simply run the following commands in succession:
 
 `npm start`
 
-These commands will install all necessary packages for both the backend and frontend. The `start` script uses the package Concurrently in order to run all servers in one console.
+The first command will install all necessary packages for both the backend and frontend. The `start` script uses the package Concurrently in order to run all servers in one console.
 
 # Credits
 
